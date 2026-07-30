@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cahier de Français — Ch.2 Les vrais amis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF7EF;
+    --paper-line:#CFE0F0;
+    --margin:#E88BA0;
+    --ink:#233B5C;
+    --ink-soft:#4C6584;
+    --accent:#C0392B;
+    --accent-soft:#F3D9CE;
+    --good:#2F7D5C;
+    --good-bg:#DCEEE4;
+    --bad:#C0392B;
+    --bad-bg:#FBE1DC;
+    --card-shadow: 0 1px 0 rgba(35,59,92,0.06), 0 12px 30px -18px rgba(35,59,92,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 33px, var(--paper-line) 34px),
+      var(--paper);
+    background-position: 0 90px;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    position:relative;
+    padding-bottom:60px;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    top:0; bottom:0; left:64px;
+    width:2px;
+    background:var(--margin);
+    opacity:0.55;
+    z-index:0;
+  }
+  @media (max-width:640px){ body::before{ left:34px; } }
+
+  .wrap{ max-width:760px; margin:0 auto; padding: 34px 24px 0 84px; position:relative; z-index:1; }
+  @media (max-width:640px){ .wrap{ padding: 28px 16px 0 52px; } }
+
+  header{ margin-bottom: 22px; }
+  .kicker{
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .kicker::before{ content:"✎"; font-size:13px; }
+  h1{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:52px;
+    line-height:1;
+    margin:4px 0 2px;
+    color:var(--ink);
+  }
+  .sub{ font-size:14.5px; color:var(--ink-soft); }
+
+  nav.tabs{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:26px 0 22px;
+  }
+  .tab{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:8px 14px;
+    border-radius:999px;
+    border:1.5px solid var(--paper-line);
+    background:#fff;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .tab:hover{ border-color:var(--ink-soft); color:var(--ink); }
+  .tab.active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:var(--paper);
+  }
+
+  .deck-meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:12px;
+  }
+  .deck-title{ font-family:'Caveat',cursive; font-weight:700; font-size:26px; }
+  .progress{ font-family:'Space Mono',monospace; font-size:12.5px; color:var(--ink-soft); }
+
+  .card{
+    position:relative;
+    min-height:210px;
+    border-radius:14px;
+    background:#fff;
+    border:1.5px solid var(--paper-line);
+    box-shadow:var(--card-shadow);
+    padding:30px 26px 24px;
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .card .tag{
+    position:absolute; top:14px; left:18px;
+    font-family:'Space Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    opacity:0.7;
+  }
+  .speak-btn{
+    position:absolute; top:12px; right:14px;
+    width:36px; height:36px; border-radius:50%;
+    border:1.5px solid var(--paper-line); background:#fff;
+    cursor:pointer; font-size:16px; color:var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    transition:all .15s ease;
+  }
+  .speak-btn:hover{ border-color:var(--accent); color:var(--accent); }
+  .speak-btn.playing{ background:var(--accent-soft); border-color:var(--accent); }
+
+  .fr-word{ font-family:'Caveat',cursive; font-weight:700; font-size:42px; color:var(--ink); margin-top:10px; }
+  .pron{ font-family:'Space Mono',monospace; font-size:14px; color:var(--accent); margin-top:2px; }
+  .fr-sub{ font-size:12.5px; color:var(--ink-soft); margin-top:4px; }
+  .divider{ width:40px; height:2px; background:var(--paper-line); margin:16px auto; }
+  .en-word{ font-family:'Inter',sans-serif; font-weight:700; font-size:23px; color:var(--ink); }
+  .en-sub{ font-size:12.5px; color:var(--ink-soft); margin-top:6px; }
+
+  .controls{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin-bottom: 30px;
+  }
+  .btn{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px;
+    padding:9px 16px; border-radius:10px; border:1.5px solid var(--ink);
+    background:var(--ink); color:var(--paper); cursor:pointer;
+    transition:opacity .15s ease;
+  }
+  .btn.ghost{ background:transparent; color:var(--ink); }
+  .btn:hover{ opacity:0.82; }
+  .btn:active{ transform:translateY(1px); }
+  .icon-btn{
+    width:38px; height:38px; border-radius:10px;
+    border:1.5px solid var(--paper-line); background:#fff; color:var(--ink);
+    cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;
+  }
+  .icon-btn:hover{ border-color:var(--ink-soft); }
+
+  .quiz-toggle-row{
+    display:flex; justify-content:center; margin-bottom:20px;
+  }
+  .switch-label{
+    font-family:'Space Mono',monospace; font-size:12px; color:var(--ink-soft);
+    display:flex; align-items:center; gap:8px; cursor:pointer;
+  }
+  .switch{
+    width:36px; height:20px; border-radius:999px; background:var(--paper-line);
+    position:relative; transition:background .15s ease; flex-shrink:0;
+  }
+  .switch.on{ background:var(--accent); }
+  .switch::after{
+    content:""; position:absolute; top:2px; left:2px;
+    width:16px; height:16px; border-radius:50%; background:#fff;
+    transition:transform .15s ease; box-shadow:0 1px 3px rgba(0,0,0,0.25);
+  }
+  .switch.on::after{ transform:translateX(16px); }
+
+  .quiz-box{
+    background:#fff; border:1.5px solid var(--paper-line); border-radius:14px;
+    padding:26px; text-align:center; box-shadow:var(--card-shadow); margin-bottom:18px;
+  }
+  .quiz-box .prompt-tag{
+    font-family:'Space Mono',monospace; font-size:10.5px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--ink-soft); margin-bottom:10px;
+  }
+  .quiz-box .prompt{ font-family:'Caveat',cursive; font-weight:700; font-size:36px; margin-bottom:16px; }
+  .quiz-box input{
+    font-family:'Inter',sans-serif; font-size:16px; padding:10px 14px;
+    border:1.5px solid var(--paper-line); border-radius:10px; width:100%; max-width:320px;
+    outline:none; text-align:center;
+  }
+  .quiz-box input:focus{ border-color:var(--ink); }
+  .feedback{
+    margin-top:14px; font-weight:600; font-size:14px; min-height:20px;
+    padding:8px 12px; border-radius:8px; display:inline-block;
+  }
+  .feedback.good{ background:var(--good-bg); color:var(--good); }
+  .feedback.bad{ background:var(--bad-bg); color:var(--bad); }
+
+  .score-row{
+    display:flex; justify-content:center; gap:22px; margin-bottom:8px;
+    font-family:'Space Mono',monospace; font-size:12.5px; color:var(--ink-soft);
+  }
+  .score-row b{ color:var(--ink); }
+
+  footer{
+    text-align:center; margin-top:36px; font-size:12px; color:var(--ink-soft);
+    font-family:'Space Mono',monospace;
+  }
+  .no-audio-note{
+    text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:-8px; margin-bottom:16px;
+    display:none;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Ch.2 · Les vrais amis</div>
+    <h1>Cahier de Français</h1>
+    <div class="sub">Pronunciation and translation shown together — click 🔊 to hear it, use ← → to move through the deck.</div>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <div class="deck-meta">
+    <div class="deck-title" id="deckTitle"></div>
+    <div class="progress" id="progress"></div>
+  </div>
+
+  <div class="quiz-toggle-row">
+    <label class="switch-label" id="quizToggle">
+      <span class="switch" id="switchEl"></span>
+      Quiz me instead (type the English translation)
+    </label>
+  </div>
+
+  <!-- Learn mode -->
+  <div id="learnMode">
+    <div class="card" id="card">
+      <div class="tag">français</div>
+      <button class="speak-btn" id="speakBtn" title="Hear pronunciation">🔊</button>
+      <div class="fr-word" id="frWord"></div>
+      <div class="pron" id="pronWord"></div>
+      <div class="fr-sub" id="frSub"></div>
+      <div class="divider"></div>
+      <div class="en-word" id="enWord"></div>
+      <div class="en-sub" id="enSub"></div>
+    </div>
+    <div class="no-audio-note" id="noAudioNote">Voice playback isn't available in this browser — the written pronunciation guide above still works.</div>
+    <div class="controls">
+      <button class="icon-btn" id="prevBtn" title="Previous">←</button>
+      <button class="btn ghost" id="shuffleBtn">Shuffle</button>
+      <button class="btn" id="nextBtn2">Next card →</button>
+    </div>
+  </div>
+
+  <!-- Quiz mode -->
+  <div id="quizMode" style="display:none;">
+    <div class="score-row">
+      <span>Score: <b id="scoreCorrect">0</b>/<b id="scoreTotal">0</b></span>
+    </div>
+    <div class="quiz-box">
+      <div class="prompt-tag">what does this mean in english?</div>
+      <div class="prompt" id="quizPrompt"></div>
+      <input type="text" id="quizInput" placeholder="Type your answer…" autocomplete="off">
+      <div><div class="feedback" id="quizFeedback" style="display:none;"></div></div>
+    </div>
+    <div class="controls">
+      <button class="btn ghost" id="skipBtn">Skip</button>
+      <button class="btn" id="checkBtn">Check answer</button>
+    </div>
+  </div>
+
+  <footer>made from your Ch.2 notebook pages — bon courage !</footer>
+</div>
+
+<script>
+const decks = {
+  adjectifs: {
+    title: "Adjectifs (masc. → fém.)",
+    cards: [
+      {fr:"triste", pron:"treest", frSub:"no change", en:"sad", enSub:""},
+      {fr:"large", pron:"larzh", frSub:"no change", en:"wide / broad", enSub:""},
+      {fr:"amusant → amusante", pron:"ah-mü-zahn → ah-mü-zahnt", frSub:"+e", en:"funny", enSub:""},
+      {fr:"fatigué → fatiguée", pron:"fah-tee-gay", frSub:"+e (sounds the same)", en:"tired", enSub:""},
+      {fr:"heureux → heureuse", pron:"uh-ruh → uh-ruhz", frSub:"-x → -se", en:"happy", enSub:""},
+      {fr:"respectueux → respectueuse", pron:"res-pek-twuh → res-pek-twuhz", frSub:"-x → -se", en:"respectful", enSub:""},
+      {fr:"mignon → mignonne", pron:"mee-nyawn → mee-nyun", frSub:"-on → -onne", en:"cute", enSub:""},
+      {fr:"bon → bonne", pron:"bawn → bun", frSub:"-on → -onne", en:"good", enSub:""},
+      {fr:"gros → grosse", pron:"groh → grohs", frSub:"-s → -sse", en:"fat / big", enSub:""},
+      {fr:"gentil → gentille", pron:"zhahn-tee → zhahn-tee-y", frSub:"-l → -lle", en:"nice / kind", enSub:""},
+      {fr:"léger → légère", pron:"lay-zhay → lay-zhehr", frSub:"-er → -ère", en:"light", enSub:""},
+      {fr:"actif → active", pron:"ak-teef → ak-teev", frSub:"-f → -ve", en:"active", enSub:""},
+      {fr:"sportif → sportive", pron:"spor-teef → spor-teev", frSub:"-f → -ve", en:"sporty / athletic", enSub:""},
+      {fr:"long → longue", pron:"lawng → lawng-g", frSub:"exception", en:"long", enSub:""},
+      {fr:"sec → sèche", pron:"sek → sesh", frSub:"exception", en:"dry", enSub:""},
+      {fr:"blanc → blanche", pron:"blahng → blahnsh", frSub:"exception", en:"white", enSub:""},
+      {fr:"beau / bel / belle", pron:"boh / bel / bel", frSub:"3 forms — bel before vowel sound", en:"beautiful / handsome", enSub:""},
+      {fr:"nouveau / nouvel / nouvelle", pron:"noo-voh / noo-vel / noo-vel", frSub:"3 forms — nouvel before vowel sound", en:"new", enSub:""},
+      {fr:"vieux / vieil / vieille", pron:"vyuh / vyay / vyay", frSub:"3 forms — vieil before vowel sound", en:"old", enSub:""},
+    ]
+  },
+  placement: {
+    title: "Placement des adjectifs",
+    cards: [
+      {fr:"une robe rouge", pron:"ewn rohb roozh", frSub:"colour → after noun", en:"a red dress", enSub:""},
+      {fr:"une salle carrée", pron:"ewn sal kah-ray", frSub:"shape → after noun", en:"a square room", enSub:""},
+      {fr:"une femme anglaise", pron:"ewn fam ahn-glez", frSub:"nationality → after noun", en:"an English woman", enSub:""},
+      {fr:"des mains propres", pron:"day mahn prohpr", frSub:"physical trait → after noun", en:"clean hands", enSub:""},
+      {fr:"une histoire extraordinaire", pron:"ewn ees-twahr ex-trah-or-dee-nehr", frSub:"long adj → after noun", en:"an extraordinary story", enSub:""},
+      {fr:"un temple hindou", pron:"uhn tahnpl an-doo", frSub:"religion → after noun", en:"a Hindu temple", enSub:""},
+      {fr:"une belle fille", pron:"ewn bel feey", frSub:"beauty → before noun", en:"a beautiful girl", enSub:""},
+      {fr:"une haute montagne", pron:"ewn oht mawn-tanyuh", frSub:"size → before noun", en:"a high mountain", enSub:""},
+      {fr:"une autre maison", pron:"ewn ohtr may-zawn", frSub:"before noun", en:"another house", enSub:""},
+      {fr:"plusieurs gens", pron:"plew-zyuhr zhahn", frSub:"before noun", en:"several people", enSub:""},
+      {fr:"le premier jour", pron:"luh pruh-myay zhoor", frSub:"ordinal → before noun", en:"the first day", enSub:""},
+      {fr:"le quinzième siècle", pron:"luh kanz-yem syekl", frSub:"ordinal → before noun", en:"the fifteenth century", enSub:""},
+    ]
+  },
+  verbsir: {
+    title: "Verbes en -ir : sortir & partir",
+    cards: [
+      {fr:"je sors", pron:"zhuh sor", frSub:"sortir", en:"I go out", enSub:""},
+      {fr:"tu sors", pron:"tew sor", frSub:"sortir", en:"you go out", enSub:""},
+      {fr:"il / elle sort", pron:"eel / el sor", frSub:"sortir", en:"he / she goes out", enSub:""},
+      {fr:"nous sortons", pron:"noo sor-tawn", frSub:"sortir", en:"we go out", enSub:""},
+      {fr:"vous sortez", pron:"voo sor-tay", frSub:"sortir", en:"you (pl./formal) go out", enSub:""},
+      {fr:"ils / elles sortent", pron:"eel / el sort", frSub:"sortir", en:"they go out", enSub:""},
+      {fr:"je pars", pron:"zhuh pahr", frSub:"partir", en:"I leave", enSub:""},
+      {fr:"tu pars", pron:"tew pahr", frSub:"partir", en:"you leave", enSub:""},
+      {fr:"il / elle part", pron:"eel / el pahr", frSub:"partir", en:"he / she leaves", enSub:""},
+      {fr:"nous partons", pron:"noo par-tawn", frSub:"partir", en:"we leave", enSub:""},
+      {fr:"vous partez", pron:"voo par-tay", frSub:"partir", en:"you (pl./formal) leave", enSub:""},
+      {fr:"ils / elles partent", pron:"eel / el part", frSub:"partir", en:"they leave", enSub:""},
+      {fr:"mentir", pron:"mahn-teer", frSub:"other -ir verb", en:"to lie", enSub:""},
+      {fr:"sentir", pron:"sahn-teer", frSub:"other -ir verb", en:"to smell", enSub:""},
+    ]
+  },
+  pronominaux: {
+    title: "Verbes pronominaux (réfléchis)",
+    cards: [
+      {fr:"je me réveille", pron:"zhuh muh ray-vey", frSub:"se réveiller", en:"I wake up", enSub:""},
+      {fr:"tu te réveilles", pron:"tew tuh ray-vey", frSub:"se réveiller", en:"you wake up", enSub:""},
+      {fr:"il / elle se réveille", pron:"eel / el suh ray-vey", frSub:"se réveiller", en:"he / she wakes up", enSub:""},
+      {fr:"nous nous réveillons", pron:"noo noo ray-vey-yawn", frSub:"se réveiller", en:"we wake up", enSub:""},
+      {fr:"vous vous réveillez", pron:"voo voo ray-vey-yay", frSub:"se réveiller", en:"you wake up", enSub:""},
+      {fr:"ils / elles se réveillent", pron:"eel / el suh ray-vey", frSub:"se réveiller", en:"they wake up", enSub:""},
+      {fr:"je m'assieds", pron:"zhuh mah-syay", frSub:"s'asseoir (irregular)", en:"I sit", enSub:""},
+      {fr:"nous nous asseyons", pron:"noo noo zah-say-yawn", frSub:"s'asseoir (irregular)", en:"we sit", enSub:""},
+      {fr:"je me lève", pron:"zhuh muh lev", frSub:"se lever — grave accent", en:"I get up", enSub:""},
+      {fr:"nous nous levons", pron:"noo noo luh-vawn", frSub:"se lever — no accent for nous", en:"we get up", enSub:""},
+      {fr:"je ne me promène pas", pron:"zhuh nuh muh pruh-men pah", frSub:"négation", en:"I don't go for a walk", enSub:""},
+      {fr:"s'amuser", pron:"sah-mü-zay", frSub:"vocab", en:"to enjoy / have fun", enSub:""},
+      {fr:"se baigner", pron:"suh ben-yay", frSub:"vocab", en:"to bathe", enSub:""},
+      {fr:"se laver", pron:"suh lah-vay", frSub:"vocab", en:"to wash oneself", enSub:""},
+      {fr:"se brosser", pron:"suh bro-say", frSub:"vocab", en:"to brush", enSub:""},
+      {fr:"se coiffer", pron:"suh kwah-fay", frSub:"vocab", en:"to comb / style hair", enSub:""},
+      {fr:"se promener", pron:"suh pruh-muh-nay", frSub:"vocab", en:"to go for a walk", enSub:""},
+      {fr:"s'appeler", pron:"sah-play", frSub:"vocab", en:"to be called / named", enSub:""},
+      {fr:"se reposer", pron:"suh ruh-po-zay", frSub:"vocab", en:"to take rest", enSub:""},
+      {fr:"se coucher", pron:"suh koo-shay", frSub:"vocab", en:"to go to bed", enSub:""},
+      {fr:"s'endormir", pron:"sahn-dor-meer", frSub:"vocab", en:"to fall asleep", enSub:""},
+      {fr:"s'habiller", pron:"sah-bee-yay", frSub:"vocab", en:"to dress up", enSub:""},
+      {fr:"se parfumer", pron:"suh par-few-may", frSub:"vocab", en:"to put perfume on", enSub:""},
+      {fr:"se taire", pron:"suh tehr", frSub:"vocab", en:"to keep quiet", enSub:""},
+      {fr:"se blesser", pron:"suh bles-say", frSub:"vocab", en:"to get hurt", enSub:""},
+    ]
+  },
+  heure: {
+    title: "Quelle heure est-il ?",
+    cards: [
+      {fr:"une heure", pron:"ewn uhr", frSub:"", en:"one o'clock", enSub:""},
+      {fr:"une heure cinq", pron:"ewn uhr sank", frSub:"", en:"five past one", enSub:""},
+      {fr:"une heure dix", pron:"ewn uhr dees", frSub:"", en:"ten past one", enSub:""},
+      {fr:"une heure et quart", pron:"ewn uhr ay kahr", frSub:"", en:"quarter past one", enSub:""},
+      {fr:"une heure vingt", pron:"ewn uhr vang", frSub:"", en:"twenty past one", enSub:""},
+      {fr:"une heure vingt-cinq", pron:"ewn uhr vang-sank", frSub:"", en:"twenty-five past one", enSub:""},
+      {fr:"une heure et demie", pron:"ewn uhr ay duh-mee", frSub:"", en:"half past one", enSub:""},
+      {fr:"deux heures moins vingt-cinq", pron:"duh zuhr mwan vang-sank", frSub:"", en:"twenty-five to two", enSub:""},
+      {fr:"deux heures moins vingt", pron:"duh zuhr mwan vang", frSub:"", en:"twenty to two", enSub:""},
+      {fr:"deux heures moins le quart", pron:"duh zuhr mwan luh kahr", frSub:"", en:"quarter to two", enSub:""},
+      {fr:"deux heures moins dix", pron:"duh zuhr mwan dees", frSub:"", en:"ten to two", enSub:""},
+      {fr:"deux heures moins cinq", pron:"duh zuhr mwan sank", frSub:"", en:"five to two", enSub:""},
+    ]
+  }
+};
+
+let currentDeckKey = "adjectifs";
+let order = [];
+let idx = 0;
+let quizMode = false;
+let score = { correct:0, total:0 };
+
+const tabsEl = document.getElementById('tabs');
+const deckTitleEl = document.getElementById('deckTitle');
+const progressEl = document.getElementById('progress');
+const frWordEl = document.getElementById('frWord');
+const pronWordEl = document.getElementById('pronWord');
+const frSubEl = document.getElementById('frSub');
+const enWordEl = document.getElementById('enWord');
+const enSubEl = document.getElementById('enSub');
+const learnModeEl = document.getElementById('learnMode');
+const quizModeEl = document.getElementById('quizMode');
+const switchEl = document.getElementById('switchEl');
+const quizPromptEl = document.getElementById('quizPrompt');
+const quizInputEl = document.getElementById('quizInput');
+const quizFeedbackEl = document.getElementById('quizFeedback');
+const scoreCorrectEl = document.getElementById('scoreCorrect');
+const scoreTotalEl = document.getElementById('scoreTotal');
+const speakBtn = document.getElementById('speakBtn');
+const noAudioNote = document.getElementById('noAudioNote');
+
+const audioSupported = ('speechSynthesis' in window);
+if(!audioSupported){ noAudioNote.style.display = 'block'; speakBtn.style.display='none'; }
+
+function buildTabs(){
+  Object.keys(decks).forEach(key=>{
+    const b = document.createElement('button');
+    b.className = 'tab' + (key===currentDeckKey ? ' active':'');
+    b.textContent = decks[key].title.split('(')[0].split(':')[0].trim();
+    b.onclick = ()=> switchDeck(key);
+    b.dataset.key = key;
+    tabsEl.appendChild(b);
+  });
+}
+
+function switchDeck(key){
+  currentDeckKey = key;
+  order = decks[key].cards.map((_,i)=>i);
+  idx = 0;
+  score = {correct:0, total:0};
+  [...tabsEl.children].forEach(b=> b.classList.toggle('active', b.dataset.key===key));
+  deckTitleEl.textContent = decks[key].title;
+  render();
+}
+
+function render(){
+  const deck = decks[currentDeckKey];
+  const card = deck.cards[order[idx]];
+  progressEl.textContent = `${idx+1} / ${deck.cards.length}`;
+
+  if(!quizMode){
+    frWordEl.textContent = card.fr;
+    pronWordEl.textContent = '[ ' + card.pron + ' ]';
+    frSubEl.textContent = card.frSub;
+    enWordEl.textContent = card.en;
+    enSubEl.textContent = card.enSub;
+  } else {
+    quizPromptEl.textContent = card.fr;
+    quizInputEl.value = '';
+    quizFeedbackEl.style.display = 'none';
+    scoreCorrectEl.textContent = score.correct;
+    scoreTotalEl.textContent = score.total;
+    quizInputEl.focus();
+  }
+}
+
+function speakCurrent(){
+  if(!audioSupported) return;
+  const deck = decks[currentDeckKey];
+  const card = deck.cards[order[idx]];
+  const cleanText = card.fr.split('→')[0].split('/')[0].trim();
+  const utter = new SpeechSynthesisUtterance(cleanText);
+  utter.lang = 'fr-FR';
+  utter.rate = 0.85;
+  speechSynthesis.cancel();
+  speakBtn.classList.add('playing');
+  utter.onend = ()=> speakBtn.classList.remove('playing');
+  speechSynthesis.speak(utter);
+}
+
+function next(){
+  idx = (idx+1) % order.length;
+  render();
+}
+function prev(){
+  idx = (idx-1+order.length) % order.length;
+  render();
+}
+function shuffle(){
+  for(let i=order.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [order[i],order[j]] = [order[j],order[i]];
+  }
+  idx = 0;
+  render();
+}
+
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/[.,/#!$%^&*;:{}=\-_`~()']/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function checkAnswer(){
+  const deck = decks[currentDeckKey];
+  const card = deck.cards[order[idx]];
+  const userAns = normalize(quizInputEl.value);
+  if(!userAns){ return; }
+  const correctAns = normalize(card.en.split('/')[0]);
+  const altAns = normalize(card.en);
+  const isCorrect = userAns === correctAns || userAns === altAns || (correctAns.includes(userAns) && userAns.length>2);
+
+  score.total++;
+  if(isCorrect){
+    score.correct++;
+    quizFeedbackEl.className = 'feedback good';
+    quizFeedbackEl.textContent = '✓ Correct — ' + card.en;
+  } else {
+    quizFeedbackEl.className = 'feedback bad';
+    quizFeedbackEl.textContent = '✗ Answer: ' + card.en;
+  }
+  quizFeedbackEl.style.display = 'inline-block';
+  scoreCorrectEl.textContent = score.correct;
+  scoreTotalEl.textContent = score.total;
+
+  setTimeout(next, 1300);
+}
+
+function toggleQuiz(){
+  quizMode = !quizMode;
+  switchEl.classList.toggle('on', quizMode);
+  learnModeEl.style.display = quizMode ? 'none' : 'block';
+  quizModeEl.style.display = quizMode ? 'block' : 'none';
+  render();
+}
+
+speakBtn.onclick = speakCurrent;
+document.getElementById('nextBtn2').onclick = next;
+document.getElementById('prevBtn').onclick = prev;
+document.getElementById('shuffleBtn').onclick = shuffle;
+document.getElementById('quizToggle').onclick = toggleQuiz;
+document.getElementById('checkBtn').onclick = checkAnswer;
+document.getElementById('skipBtn').onclick = ()=>{ score.total++; scoreTotalEl.textContent=score.total; next(); };
+quizInputEl.addEventListener('keydown', e=>{ if(e.key==='Enter') checkAnswer(); });
+document.addEventListener('keydown', e=>{
+  if(quizMode) return;
+  if(e.key==='ArrowRight') next();
+  if(e.key==='ArrowLeft') prev();
+  if(e.key===' '){ e.preventDefault(); speakCurrent(); }
+});
+
+buildTabs();
+switchDeck('adjectifs');
+</script>
+</body>
+</html>
